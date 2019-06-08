@@ -175,7 +175,7 @@ public class MainApp  extends Application {
 
     }
 
-    private class NodeFactory {
+    private static class NodeFactory {
 
         private final ObservableList<javafx.scene.Node> shapes;
         private final RouteOptimizator routeOptimizator;
@@ -298,10 +298,17 @@ public class MainApp  extends Application {
                 next = next.next;
             } while (next != null);
 
-
+            //todo return MergeNode
             return Pair.of(selectedNode, minLength);
         }
 
+        static class MergeNode{
+            /*
+            Pairs of challenge node and node of main route
+             */
+            List<Pair<Node,Node>> insertAfter = new ArrayList<>();
+            double length;
+        }
         private Double calcOnRoute(Node route, BiFunction<Node, Double, Double> function) {
             Node next =  route;
             double value = 0;
