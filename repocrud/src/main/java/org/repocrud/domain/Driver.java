@@ -26,30 +26,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldNameConstants
-public class CarModel extends Auditable {
+public class Driver extends Auditable {
     @NotNull
     private String title;
 
-    @Enumerated(EnumType.STRING)
-    private TransportType type;
-
-    @NotNull
-    private Integer trailer;
-
-    @NotNull
-    private Double weight;
-
-    @NotNull
-    private Double maxLoadWeight;
-
-    @NonNull
-    private Integer axis = 3;
-
-    @NotNull
-    private Double emptyConsumption;
-
-    @NotNull
-    private Double fullConsumption;
+    private String systemApiId;
 
 
 

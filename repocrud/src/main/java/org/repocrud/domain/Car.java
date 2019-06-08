@@ -10,6 +10,7 @@ import org.springframework.lang.NonNull;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -26,33 +27,17 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldNameConstants
-public class CarModel extends Auditable {
+public class Car extends Auditable {
     @NotNull
     private String title;
 
-    @Enumerated(EnumType.STRING)
-    private TransportType type;
+    @ManyToOne
+    private Driver driver;
 
-    @NotNull
-    private Integer trailer;
+    @ManyToOne
+    private CarModel carModel;
 
-    @NotNull
-    private Double weight;
-
-    @NotNull
-    private Double maxLoadWeight;
-
-    @NonNull
-    private Integer axis = 3;
-
-    @NotNull
-    private Double emptyConsumption;
-
-    @NotNull
-    private Double fullConsumption;
-
-
-
+    private String carId;
 
 
 }

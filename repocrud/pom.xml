@@ -11,11 +11,8 @@
 
     <groupId>org.repocrud</groupId>
     <artifactId>repocrud</artifactId>
-    <packaging>pom</packaging>
+
     <version>1.00-SNAPSHOT</version>
-    <modules>
-        <module>restclient</module>
-    </modules>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

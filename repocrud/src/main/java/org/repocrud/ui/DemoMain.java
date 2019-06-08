@@ -8,10 +8,13 @@ import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import lombok.extern.slf4j.Slf4j;
-import org.repocrud.crud.CompanyCrudContainer;
-import org.repocrud.crud.GlossaryCrudContainer;
-import org.repocrud.crud.SettingsCrudContainer;
-import org.repocrud.crud.UserRepositoryCrud;
+import org.repocrud.crud.*;
+import org.repocrud.domain.Car;
+import org.repocrud.domain.CarModel;
+import org.repocrud.domain.Driver;
+import org.repocrud.repository.CarModelRepository;
+import org.repocrud.repository.CarRepository;
+import org.repocrud.repository.DriverRepository;
 import org.repocrud.ui.components.TabContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -43,9 +46,22 @@ public class DemoMain extends HorizontalLayout {
     @Autowired
     private SettingsCrudContainer settingsCrudContainer;
 
+    @Autowired
+    CarRepository carRepository;
+    @Autowired
+    DriverRepository driverRepository;
+    @Autowired
+    CarModelRepository carModelRepository;
+
+
     @PostConstruct
     private void init() {
         TabContainer mainMenu = new TabContainer(Tabs.Orientation.VERTICAL);
+
+
+        mainMenu.addTab(text("car"), new RepositoryCrud<Car, Long>(Car.class, carRepository));
+        mainMenu.addTab(text("driver"), new RepositoryCrud<>(Driver.class, driverRepository));
+        mainMenu.addTab(text("carModel"), new RepositoryCrud<>(CarModel.class, carModelRepository));
 
         mainMenu.addTab(text("main.user"), userRepositoryCrud);
         mainMenu.addTab(text("main.company"), companyCrud);
