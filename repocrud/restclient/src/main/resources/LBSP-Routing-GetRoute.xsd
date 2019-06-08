@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.navteq.com/lbsp/Routing-GetRoute/4" xmlns:common="http://www.navteq.com/lbsp/Common/4" xmlns:routing-common="http://www.navteq.com/lbsp/Routing-Common/4" targetNamespace="http://www.navteq.com/lbsp/Routing-GetRoute/4" version="4.1">
+	<xs:import namespace="http://www.navteq.com/lbsp/Common/4" schemaLocation="LBSP-Common.xsd"/>
+	<xs:import namespace="http://www.navteq.com/lbsp/Routing-Common/4" schemaLocation="LBSP-Routing-Common.xsd"/>
+	<xs:complexType name="GetRouteRequestType">
+		<xs:annotation>
+			<xs:documentation>&lt;b&gt;GetRouteRequest&lt;/b&gt; is the data structure for calling the GetRoute service.
+
+The main input parameter for the GetRoute service is the RouteId that has been returned by a previous route calculation and encodes the entire route.
+
+In a corridor routing scenario additional information besides the RouteId are needed to reconstruct the corridor around the base type.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MetaInfo" type="GetRouteRequestMetaInfoType" minOccurs="0"/>
+			<xs:element name="RepresentationOptions" type="routing-common:RouteRepresentationOptionsType" minOccurs="0"/>
+			<xs:element name="RouteId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>RouteId that codes all information about a previously calculated route  needed to reconstruct exactly the same route.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CurrentPosition" type="routing-common:WaypointParameterType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>If this current position is provided the response will include the information about the travel progress with updated remaining travel times. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AvoidArea" type="common:GeoBoundingBoxType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Areas which the route must not cross</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AvoidLinks" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Links that the route may not cross.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:list itemType="common:LinkIdType"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Departure" type="xs:dateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Time when the travel is expected to start. The routing engine will consider time dependent traffic patterns and incidents when calculating the route</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Arrival" type="xs:dateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Time when the travel is expected to end. The routing engine will consider time dependent traffic patterns and incidents when calculating the route&#xA;&lt;i&gt;Note: not yet supported&lt;/i&gt;</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Mode" type="routing-common:RoutingModeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The transport mode that has been used when calculating the route. The transport mode has an impact on the speed information provided at link level.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PublicTransportProfile" type="routing-common:PublicTransportProfileType" minOccurs="0"/>
+			<xs:element name="TruckProfile" type="routing-common:TruckProfileType" minOccurs="0"/>
+			<xs:element name="MetricSystem" type="common:MetricSystemType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the system of measurement that is to be used in the maneuver text entries of the response. If &quot;metric&quot;, then all distances are in
+meters/kilometers. If &quot;imperial&quot;, then all distances are in yards/miles. If omitted the default metric system associated with the language settings will be used. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Gen" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Generation parameter used to influence which information to return in enumeration values.
+					&lt;br/&gt;
+					gen > 1: returns additional link flag type "builtUpArea" and TruckRestrictions "allHazardousGoods".
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GetRouteRequestMetaInfoType">
+		<xs:annotation>
+			<xs:documentation>Request parameters which are not specific to route retrieval.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="RequestId" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Arbitrary value which will be mirrored in the response structure. Can be used to trace back requests.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="VerboseMode" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Level of verbose information which will be included in the response structure. Can be a value between 0 and 5.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GetRouteResponseType">
+		<xs:annotation>
+			<xs:documentation>Response type for the GetRoute service.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MetaInfo" type="routing-common:RouteResponseMetaInfoType"/>
+			<xs:element name="Progress" type="routing-common:TravelProgressType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Reflects the current travel progress based on the current position provided in the request.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Route" type="routing-common:RouteType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Updated Route as requested by the corresponding GetRouteRequest. In case of an error the association might be empty.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Language" type="common:LanguageCodeParameterType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The language which us used for all textual information. The returned language may slightly deviate from the one specified in the request, in case the exact requested language is not available.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GetRouteType">
+		<xs:sequence>
+			<xs:element name="Request" type="GetRouteRequestType" minOccurs="0"/>
+			<xs:element name="Response" type="GetRouteResponseType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="GetRoute" type="GetRouteType"/>
+</xs:schema>

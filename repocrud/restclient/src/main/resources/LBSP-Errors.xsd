@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.navteq.com/lbsp/Errors/1" targetNamespace="http://www.navteq.com/lbsp/Errors/1" version="1.0">
+	<xs:element name="Error" type="ServiceErrorType"/>
+	<xs:complexType name="ServiceErrorType">
+		<xs:annotation>
+			<xs:documentation>
+				Generic error type which is used to communicate server-side errors to the client. Both technical and functional errors are covered.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Details" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Clear text error message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RequestId" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Arbitrary value to trace back the request. This value is copied from the request which caused the error.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AdditionalData" type="KeyValuePairType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Generic container to include structured details regarding the error. Each concrete error sub type defines the semantics of the values in the container.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="type" type="ErrorTypeType">
+			<xs:annotation>
+				<xs:documentation>Error package name.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="subtype" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Defined name of the error, e.g. "InvalidInputData", "ExceededUsageLimit".</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="KeyValuePairType">
+		<xs:annotation>
+			<xs:documentation>Generic key/value pair to reflect exotic attributes or attributes not supported.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="key" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Name of the attribute</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="ErrorTypeType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ApplicationError">
+				<xs:annotation>
+					<xs:documentation>Used for functional or business logic related errors.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SystemError">
+				<xs:annotation>
+					<xs:documentation>Used for technical errors.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PermissionError">
+				<xs:annotation>
+					<xs:documentation>Used if access is denied due to some permission related reasons.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

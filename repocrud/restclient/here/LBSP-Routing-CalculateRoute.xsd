@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.navteq.com/lbsp/Routing-CalculateRoute/4" xmlns:common="http://www.navteq.com/lbsp/Common/4" xmlns:routing-common="http://www.navteq.com/lbsp/Routing-Common/4" targetNamespace="http://www.navteq.com/lbsp/Routing-CalculateRoute/4" version="4.2">
+	<xs:import namespace="http://www.navteq.com/lbsp/Common/4" schemaLocation="LBSP-Common.xsd"/>
+	<xs:import namespace="http://www.navteq.com/lbsp/Routing-Common/4" schemaLocation="LBSP-Routing-Common.xsd"/>
+	<xs:complexType name="CalculateRouteRequestType">
+		<xs:annotation>
+			<xs:documentation>&lt;b&gt;CalculateRouteRequest&lt;/b&gt; is the data structure for calling the CalculateRoute service.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MetaInfo" type="CalculateRouteRequestMetaInfoType" minOccurs="0"/>
+			<xs:element name="RepresentationOptions" type="routing-common:RouteRepresentationOptionsType" minOccurs="0"/>
+			<xs:element name="Waypoint" type="routing-common:WaypointParameterType" minOccurs="2" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Array of waypoints that should be passed (in the given order) along the route.
+The first element marks the start, the last the end point. Waypoints in between are interpreted as via points.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AvoidArea" type="common:GeoBoundingBoxType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Areas which the route must not cross.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AvoidLinks" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Links that the route may not cross.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:list itemType="common:LinkIdType"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AvoidTurns" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Comma-separated list of turn types that the route should avoid.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:list itemType="routing-common:TurnType"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Departure" type="xs:dateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Time when the travel is expected to start. The routing engine will consider time dependent traffic patterns and incidents when calculating the route.
+
+You can either specify Arrival or Departure time in the route request.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Arrival" type="xs:dateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Time when the travel is expected to end. The routing engine will consider time dependent traffic patterns and incidents when calculating the route.
+
+You can either specify Arrival or Departure time in the route request.&#xA;&lt;i&gt;Note: not yet supported&lt;/i&gt;</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Alternatives" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Number of alternative routes that will be returned.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Mode" type="routing-common:RoutingModeType" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>The routing mode specifies how the route shall be calculated. One route (resp. number of alternatives if set) will be calculated for each requested routing mode.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PublicTransportProfile" type="routing-common:PublicTransportProfileType" minOccurs="0"/>
+			<xs:element name="TruckProfile" type="routing-common:TruckProfileType" minOccurs="0"/>
+			<xs:element name="AdditionalData" type="common:KeyValuePairType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>List of KeyValuePairType elements as generic container to attach additional information to the request.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="NavigationMode" type="routing-common:NavigationModeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Specifies the mode of the routing calculation wrt. navigation kernel. The default value is "none", i.e. the navigation kernel is not involved in the route calculation.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GeneralizationTolerances" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Species the desired tolerances for generalizations of the base route geometry. Tolerances are given in degrees of longitude or latitude on a spherical approximation of the Earth. One meter is approximately equal to 0:00001 degrees at typical latitudes.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:list itemType="xs:double"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="MetricSystem" type="common:MetricSystemType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the system of measurement that is to be used in the maneuver text entries of the response. If &quot;metric&quot;, then all distances are in
+meters/kilometers. If &quot;imperial&quot;, then all distances are in yards/miles. If omitted the default metric system associated with the language settings will be used. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DistanceBeforeFirstTurn" type="common:DistanceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The minimum allowed distance on the first segments, before a turn is allowed. If omitted, no restrictions will apply. This parameter is taken as a hint to the computation and may not always be followed, depending on the starting point and road geometry. The value must be specified in meters.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Vehicle" type="routing-common:VehicleType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used to specify vehicle related properties, such as type of engine and average fuel consumption.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Gen" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Generation parameter used to influence which information to return in enumeration values.
+					&lt;br/&gt;
+					gen > 1: returns additional link flag type "builtUpArea" and TruckRestrictions "allHazardousGoods".
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AvoidSeasonalClosures" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used to specify if seasonal closures should be avoided during routing (if they are applied during time specified). Seasonal closures are not avoided by default.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ConsumptionModelOptions" type="routing-common:ConsumptionModelOptionsType" minOccurs="0"/>
+			<xs:element name="ForceAvoidTimeRestrictions" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used to specify if time restricted roads and maneuvers should be avoided in trip planning mode (when no departure or arrival time is specified).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ExcludeZones" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Comma-separated identifiers of the routing zones that route must not cross.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:list itemType="xs:unsignedLong"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ExcludeCountries" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Comma-separated three letter country codes (ISO 3166-1 alpha-3) that must be excluded from route calculation</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:list itemType="common:CountryCodeType"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SpeedProfile" type="routing-common:SpeedProfileType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used to specify a speed profile variant for given routing mode.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LicensePlate" type="routing-common:LicensePlateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used to specify a vehicle's license plate.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AllowedZones" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Comma-separated identifiers of the zones where routing engine should not take zone restrictions into account (e.g. due to special permissions). Allowed zones are also not considered in excluded zone types evaluation.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:list itemType="xs:unsignedLong"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ExcludeZoneTypes" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Comma-separated routing zone types that route must not cross.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:list itemType="routing-common:RoutingZoneTypeType"/>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CalculateRouteRequestMetaInfoType">
+		<xs:annotation>
+			<xs:documentation>Request parameters which are not specific to route calculation</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="RequestId" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Clients may pass in arbitrary values to trace request processing through the system. The RequestId will be mirrored in the MetaInfo element of the response structure.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="VerboseMode" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Level of verbose information which will be included in the response structure. Can be a value between 0 and 5.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CalculateRouteResponseType">
+		<xs:annotation>
+			<xs:documentation>&lt;b&gt;CalculateRouteResponse&lt;/b&gt; is the data structure for the responses from the CalculateRoute service.  A &lt;b&gt;CalculateRouteResponse&lt;/b&gt; element always corresponds to a request of type &lt;b&gt;CalculateRouteRequest&lt;/b&gt;.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MetaInfo" type="routing-common:RouteResponseMetaInfoType"/>
+			<xs:element name="Route" type="routing-common:RouteType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Language" type="common:LanguageCodeParameterType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The language which us used for all textual information. The returned language may slightly deviate from the one specified in the request, in case the exact requested language is not available.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SourceAttribution" type="routing-common:SourceAttributionType"  minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CalculateRouteType">
+		<xs:sequence>
+			<xs:element name="Request" type="CalculateRouteRequestType" minOccurs="0"/>
+			<xs:element name="Response" type="CalculateRouteResponseType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="CalculateRoute" type="CalculateRouteType"/>
+</xs:schema>

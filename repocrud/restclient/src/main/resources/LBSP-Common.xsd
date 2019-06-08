@@ -1,0 +1,1066 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.navteq.com/lbsp/Common/4" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://www.navteq.com/lbsp/Common/4" version="4.6" jaxb:version="2.1">
+	<xs:simpleType name="LongitudeType">
+		<xs:annotation>
+			<xs:documentation>Location of a place on Earth east or west of the prime meridian.
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.
+Degree in ]-180,180]; WGS84 decimal degrees where applicable</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:double">
+			<xs:minInclusive value="-180"/>
+			<xs:maxInclusive value="180"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LatitudeType">
+		<xs:annotation>
+			<xs:documentation>Location of a place on Earth north or south of the equator.
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.
+Degree in [-90,+90]; WGS84 decimal degrees where applicable</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:double">
+			<xs:minInclusive value="-90"/>
+			<xs:maxInclusive value="90"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AltitudeType">
+		<xs:annotation>
+			<xs:documentation>The altitude specifies the elevation of a point above mean sea level.
+The value is defined in meters.
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.
+unit: meter</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:double"/>
+	</xs:simpleType>
+	<xs:simpleType name="HeadingType">
+		<xs:annotation>
+			<xs:documentation>Heading in degrees starting at true north and continuing clockwise around the compass. North is 0 degrees, east is 90 degrees, south is 180 degrees, west is 270 degrees.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:double">
+			<xs:minInclusive value="0"/>
+			<xs:maxExclusive value="360"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AngleType">
+		<xs:annotation>
+			<xs:documentation>Angle in degrees.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:double">
+			<xs:minInclusive value="-360"/>
+			<xs:maxInclusive value="360"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CardinalDirectionType">
+		<xs:annotation>
+			<xs:documentation>Enumeration type representing the four cardinal (north, east, south, west) and the four ordinal (NE, SE, SW, NW) directions.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="N"/>
+			<xs:enumeration value="E"/>
+			<xs:enumeration value="S"/>
+			<xs:enumeration value="W"/>
+			<xs:enumeration value="NE"/>
+			<xs:enumeration value="SE"/>
+			<xs:enumeration value="SW"/>
+			<xs:enumeration value="NW"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="KeyValuePairType">
+		<xs:annotation>
+			<xs:documentation>Generic key/value pair to reflect exotic attributes or attributes not supported.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="key" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="GeoCoordinateType">
+		<xs:annotation>
+			<xs:documentation>The coordinate represents a geographical position. As most of the use cases currently do not consider height information the altitude is defined as optional.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Latitude" type="LatitudeType">
+				<xs:annotation>
+					<xs:documentation>Latitude in degrees. -90 &amp;lt;= latitude &amp;lt;= 90.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Longitude" type="LongitudeType">
+				<xs:annotation>
+					<xs:documentation>Longitude in degrees. -180 &amp;lt;= longitude &amp;lt;= 180.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Altitude" type="AltitudeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Altitude in meters</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="CoordinatesArrayType">
+		<xs:annotation>
+			<xs:documentation>A compact representation for a list of geographic coordinates. Each coordinate entry is represented as &lt;latitude&gt;,&lt;longitude&gt;,&lt;altitude&gt;. The altitude is optional.</xs:documentation>
+			<xs:documentation>e.g. as in &quot;37.830128,-122.378009,100 37.830379,-122.377885,100&quot;</xs:documentation>
+		</xs:annotation>
+		<xs:list itemType="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="GeoPolygonType">
+		<xs:annotation>
+			<xs:documentation>A polygon defined in geometric coordinates.
+In contrast to the Polyline, it is assumed that the last coordinate within the list is connected with the first coordinate and thus constructs an enclosed geometry.
+
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="CoordinatesArrayType"/>
+	</xs:simpleType>
+	<xs:simpleType name="GeoPolylineType">
+		<xs:annotation>
+			<xs:documentation>A polyline is a list of geographic coordinates. The edge between two subsequent coordinates is alway assumed to be the shortest way between the two.
+
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="CoordinatesArrayType"/>
+	</xs:simpleType>
+	<xs:simpleType name="SideOfStreetType">
+		<xs:annotation>
+			<xs:documentation>Values to indicate on which side of a link an object is placed.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="left"/>
+			<xs:enumeration value="right"/>
+			<xs:enumeration value="neither"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="GeoBoundingBoxType">
+		<xs:annotation>
+			<xs:documentation>As the bounding box is specified by its top-left and bottom-right corner the box, it is not necessarily the smallest rectangle spanned by these two points; it is possible to define bounding boxes that are wider than 180 degrees or higher than 90 degrees (e.g. by setting the longitude of top-left corner to a bigger value than the longitude of the bottom-right corner). A bounding box with longitude of  180 degrees for the top-left corner and a longitude of 180 degrees for the bottom-right corner constructs an area that encircles the globe whereas a bounding box with the same longitude values for both corners constructs a bounding box of width 0 degrees.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="GeoAreaType">
+				<xs:sequence>
+					<xs:element name="TopLeft" type="GeoCoordinateType">
+						<xs:annotation>
+							<xs:documentation>Top left corner of the bounding box</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="BottomRight" type="GeoCoordinateType">
+						<xs:annotation>
+							<xs:documentation>Bottom right corner of the bounding box</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GeoShapeType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Abstract base class for different shape representations. A shape is a vector geometry object which resides on a map.
+			Please check the enumeration type ShapeFormatType for a list of supported representations.</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="WKTShapeType">
+		<xs:annotation>
+			<xs:documentation>Shape represented using Well-known text (WKT) as markup language.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="GeoShapeType">
+				<xs:sequence>
+					<xs:element name="Value" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>String value containing the WKT representation.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="ShapeFormatType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="WKT">
+				<xs:annotation>
+					<xs:documentation>Identifier for Well-known text (WKT)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="QuadkeyType">
+		<xs:annotation>
+			<xs:documentation>A quadkey uniquely identifies a single tile at a particular level of detail.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-3]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MetricSystemType">
+		<xs:annotation>
+			<xs:documentation>Indicates the system of measurement that is to be used in the response. If metric, then all distances are in
+meters. If imperial, then all distances are in yards.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="metric">
+				<xs:annotation>
+					<xs:documentation>indicates that metric units should be used for distances in text.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="imperial">
+				<xs:annotation>
+					<xs:documentation>indicates that imperial units should be used for distances in text.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DistanceType">
+		<xs:annotation>
+			<xs:documentation>Distance in meters.
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.
+unit: meters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:double"/>
+	</xs:simpleType>
+    <xs:simpleType name="DistanceUnitType">
+        <xs:annotation>
+            <xs:documentation>Unit of measure used to describe distance values</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="mi">
+                <xs:annotation><xs:documentation>Mile</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="km">
+                <xs:annotation><xs:documentation>Kilometer</xs:documentation></xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+	<xs:simpleType name="VolumeType">
+		<xs:annotation>
+			<xs:documentation>Volume in liters. The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.
+unit: liters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:double"/>
+	</xs:simpleType>
+	<xs:complexType name="GeoProximityType">
+		<xs:annotation>
+			<xs:documentation>A proximity represents a circular area.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="GeoAreaType">
+				<xs:sequence>
+					<xs:element name="Center" type="GeoCoordinateType"/>
+					<xs:element name="Radius" type="DistanceType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Radius of the proximity in meters.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GeoCorridorType">
+		<xs:annotation>
+			<xs:documentation>A GeoCorridor is the two-dimensional area consisting of all points within a given width of a line.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="GeoAreaType">
+				<xs:sequence>
+					<xs:element name="Line" type="GeoPolylineType">
+						<xs:annotation>
+							<xs:documentation>List of coordinates representing a geographical line as center of the area</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Width" type="DistanceType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Corridor width in meters</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GeoPositionType">
+		<xs:annotation>
+			<xs:documentation>This type represents a snapshot of positioning information. This information is usually provided by a GPS device.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Coordinate" type="GeoCoordinateType">
+				<xs:annotation>
+					<xs:documentation>Coordinate position that has been measured by the hosted device</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Timestamp" type="xs:dateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Time at which the position has been measured</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Accuracy" type="AccuracyType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Accuracy level of the latitude and longitude coordinates</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AltitudeAccuracy" type="AccuracyType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Accuracy level of the altitude value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Heading" type="HeadingType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Direction of travel of the hosting device</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Speed" type="SpeedType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Current ground speed of the hosting device</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Source" type="GeoPositioningSource" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Information about the source used to retrieve the position (e.g. GPS, WiFi, etc.).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PeriodType">
+		<xs:annotation>
+			<xs:documentation>Represents a time period between two distinct points in time.
+
+If a corresponding type is already provided by the platform the product must not implement this class.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="From" type="xs:dateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Start date and time of the period. If the element is missing then start date and time of the period is unknown.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Until" type="xs:dateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>End date and time of the period. If the element is missing then end date and time of the period is unknown.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="DurationType">
+		<xs:annotation>
+			<xs:documentation>Duration in seconds.
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.
+unit: seconds</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:double"/>
+	</xs:simpleType>
+	<xs:simpleType name="ColorType">
+		<xs:annotation>
+			<xs:documentation>Proxy for a platform specific implementation of a "Color".</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="SpeedType">
+		<xs:annotation>
+			<xs:documentation>The speed type is used to represent speed information in m/s.
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.
+unit: m/s</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:double"/>
+	</xs:simpleType>
+    <xs:simpleType name="SpeedUnitType">
+        <xs:annotation>
+            <xs:documentation>The speed unit type defines enumeration values that represent the unit used to express speed values</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="mph">
+                <xs:annotation>
+                    <xs:documentation>miles per hour (mi/h)</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="kph">
+                <xs:annotation>
+                    <xs:documentation>kilometers per hour (km/h)</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+	<xs:simpleType name="SpeedCategoryType">
+		<xs:annotation>
+			<xs:documentation>Speed Category classifies the general speed trend of a road based on posted or implied speed limit. Speed Category values represent the combination of several
+factors besides legal speed limit (e.g., physical restriction or access characteristics). Therefore, Speed Category values can differ from Speed Limit
+values, which represent the legal speed limits only.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SC1">
+				<xs:annotation>
+					<xs:documentation>&gt;130 km/h / &gt;80 MPH</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SC2">
+				<xs:annotation>
+					<xs:documentation>101-130 km/h / 65-80 MPH</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SC3">
+				<xs:annotation>
+					<xs:documentation>91-100 km/h / 55-64 MPH</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SC4">
+				<xs:annotation>
+					<xs:documentation>71-90 km/h / 41-54 MPH</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SC5">
+				<xs:annotation>
+					<xs:documentation>51-70 km/h / 31-40 MPH</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SC6">
+				<xs:annotation>
+					<xs:documentation>31-50 km/h / 21-30 MPH</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SC7">
+				<xs:annotation>
+					<xs:documentation>11-30 km/h / 6-20 MPH</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SC8">
+				<xs:annotation>
+					<xs:documentation>&lt;11 km/h / &lt;6 MPH</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AccuracyType">
+		<xs:annotation>
+			<xs:documentation>The accuracy type is used to specify the accuracy level of measured coordinates. The accuracy level is specified in meters and must be a non-negative real number.
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.
+unit: meters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:double"/>
+	</xs:simpleType>
+	<xs:simpleType name="AdminLevelIdType">
+		<xs:annotation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(country|state|county|city|district|subdistrict)(\.[0-9]+)?"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="TMCCodeType">
+		<xs:annotation>
+			<xs:documentation>TMC (Traffic Message Channel) is a technology for delivering travel and travel information to drivers.
+The TMC code is a location code to identify the location of a traffic incident.
+
+The code has the format B + CC + D + EEEEE, where the following rules apply:
+&lt;ul&gt;
+	&lt;li&gt;&lt;b&gt;B&lt;/b&gt; is the one character EBU Country Code.
+&lt;u&gt;Note&lt;/u&gt;: EBU are defined for European Countries. There are no official EBU codes for Canada and the U.S. NAVTEQ has defined "C" for Canada and "1" for the U.S.&lt;/li&gt;
+	&lt;li&gt;&lt;b&gt;CC &lt;/b&gt;is the two digit Location Table number.&lt;/li&gt;
+	&lt;li&gt;&lt;b&gt;D&lt;/b&gt; is the one character RDS direction, where
+&lt;b&gt;"+" &lt;/b&gt;is in the positive direction and external to the Problem Location.
+&lt;b&gt;"-"&lt;/b&gt; is in the negative direction and external to the Problem Location.
+&lt;b&gt;"P" &lt;/b&gt;is in the positive direction and internal to the Problem Location.
+&lt;b&gt;"N" &lt;/b&gt;is in the negative direction and internal to the Problem Location.&lt;/li&gt;
+	&lt;li&gt;&lt;b&gt;EEEEE&lt;/b&gt; is the five digit Location Code. This has leading zeros if necessary.&lt;/li&gt;
+&lt;/ul&gt;
+
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="9"/>
+			<xs:maxLength value="9"/>
+			<xs:pattern value="\w\d{2}[+-PN]\d{5}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FunctionalClassType">
+		<xs:annotation>
+			<xs:documentation>The functional class is used to classify roads depending on the speed, importance and connectivity of the road.
+The value represents one of the five levels:
+1: allowing for high volume, maximum speed traffic movement
+2: allowing for high volume, high speed traffic movement
+3: providing a high volume of traffic movement
+4: providing for a high volume of traffic movement at moderate speeds between neighbourhoods
+5: roads whose volume and traffic movement are below the level of any functional class</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:byte">
+			<xs:minInclusive value="1"/>
+			<xs:maxInclusive value="5"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CountryCodeType">
+		<xs:annotation>
+			<xs:documentation>Country code according to ISO 3166-1-alpha-3.
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="LanguageCodeType">
+		<xs:annotation>
+			<xs:documentation>Language code following RFC5646.
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+    <xs:simpleType name="AddressNameType">
+        <xs:annotation>
+            <xs:documentation>Set of name type enumeration values, describing what type of name is returned.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+			<xs:enumeration value="abbreviation">
+				<xs:annotation><xs:documentation>Indicates whether the returned name is an abbreviation.</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="basename">
+				<xs:annotation><xs:documentation>Indicates whether the returned name is an abbreviation.</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="shortBasename">
+				<xs:annotation><xs:documentation>Indicates whether the returned name is a shortened name. Shortened names represents the recognisable, shortened part of an administrative area name.</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="exonym">
+				<xs:annotation><xs:documentation>Indicates whether the returned name is an alternate name of an administrative feature, in another languages than the default one.</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="synonym">
+				<xs:annotation><xs:documentation>Indicates whether the returned name is an alternate name of an administrative feature, in the default language.</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="transliterated">
+				<xs:annotation><xs:documentation>
+					Indicates whether the returned name is an transliterated name.
+					Transliteration is the use of Latin characters to represent non-Latin-1 characters present in languages such as Czech and Russian.
+				</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="shortSynonym">
+				<xs:annotation><xs:documentation>Indicates whether the returned name is an shortened alternate name of an administrative feature, in the default language.</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="iso2">
+				<xs:annotation><xs:documentation>ISO 2 letter country code.</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="iso3">
+				<xs:annotation><xs:documentation>ISO 3 letter country code.</xs:documentation></xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="AddressNameClassificationType">
+        <xs:annotation>
+            <xs:documentation>Defines the preference for names.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+			<xs:enumeration value="primary">
+				<xs:annotation><xs:documentation>The name is the default one which is preferred over other names (e.g. alternative or secondary).</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="alternative">
+				<xs:annotation><xs:documentation>The name that is preferred if explicitly queried for in the in request or no higher-rank names present (e.g. primary).</xs:documentation></xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="secondary">
+				<xs:annotation><xs:documentation>The name that is preferred if no higher-rank names present (e.g. primary or alternative).</xs:documentation></xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+    </xs:simpleType>
+	<xs:simpleType name="LanguageCodeParameterType">
+		<xs:annotation>
+			<xs:documentation>Language code used for input parameters following RFC4647.
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="LinkIdType">
+		<xs:annotation>
+			<xs:documentation>Permanent ID which references a network link. A minus sign as a first character indicates that the link is traversed in the opposite direction of the link's default direction (which is SW -&amp;gt; NE).
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.
+[*+-]\d+</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[*+-]\d+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LinkIdArrayType">
+		<xs:annotation>
+			<xs:documentation>A compact representation for a list of link ids. </xs:documentation>
+		</xs:annotation>
+		<xs:list itemType="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="TransitStopIdType">
+		<xs:annotation>
+			<xs:documentation>Permanent Id of the Transit Stop based on DiCi data.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="TransitSystemIdType">
+		<xs:annotation>
+			<xs:documentation>Permanent Id of the Transit System based on DiCi data.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="TransitAccessIdType">
+		<xs:annotation>
+			<xs:documentation>Permanent Id of the Transit Access based on DiCi data.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="WeightType">
+		<xs:annotation>
+			<xs:documentation>Weight in metric tons. Weights are used e.g. when defining truck restrictions on links.
+The type has been introduced for documentation purpose only and will not necessarily be respresented as a separate class in the final products.
+unit: t (ton, 1000kg)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:double"/>
+	</xs:simpleType>
+	<xs:simpleType name="ElementReferenceType">
+		<xs:annotation>
+			<xs:documentation>This type is used whenever an element needs to be cross-referenced. The CDM does explicitly not use the xs:ID construct to make element referencing transparent to other representation formats than XML.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="NameTypeType">
+		<xs:annotation>
+			<xs:documentation>Available name types used in type AlternativeValue.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="baseName"/>
+			<xs:enumeration value="shortBaseName"/>
+			<xs:enumeration value="abbreviation"/>
+			<xs:enumeration value="primary"/>
+			<xs:enumeration value="alternative"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TextSemanticsType">
+		<xs:annotation>
+			<xs:documentation>Available types of text semantics used in type AlternativeValue.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="synonym"/>
+			<xs:enumeration value="exonym"/>
+			<xs:enumeration value="unclassified"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EMailAddressType">
+		<xs:annotation>
+			<xs:documentation>String representing an EMail Address</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[^@]+@[^\.]+\..+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="UserContextType">
+		<xs:annotation>
+			<xs:documentation>The user context provides information about the user's position and the map view he is looking at.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Position" type="GeoPositionType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Position information, usually provided by a GPS device.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MapView" type="GeoBoundingBoxType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The map view the user is currently looking at.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ViewResolution" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Resolution of the view in meters per pixel (mpp). This information allows resolution specific optimizations for geometries sent in the response.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Country" type="CountryCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Code of the country the user is currently focused on.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="GeoPositioningSource">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="GPS">
+				<xs:annotation>
+					<xs:documentation>Location retrieved through Global Positioning System</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IP">
+				<xs:annotation>
+					<xs:documentation>Location inferred from IP Address</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RFID">
+				<xs:annotation>
+					<xs:documentation>Location inferred from RFID network signal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WiFi">
+				<xs:annotation>
+					<xs:documentation>Location inferred from WiFi network signal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Bluetooth">
+				<xs:annotation>
+					<xs:documentation>Location inferred from Bluetooth MAC Address</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CellId">
+				<xs:annotation>
+					<xs:documentation>Location inferred from GSM/CDMA cell IDs</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="User">
+				<xs:annotation>
+					<xs:documentation>Location retrieved through User input</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="JobStatusType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="submitted">
+				<xs:annotation>
+					<xs:documentation>Indicates that a job has been submitted, but is not yet running.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+    		<xs:enumeration value="accepted">
+    			<xs:annotation>
+    				<xs:documentation>Indicates that a job has been saved in the job queue and waits for execution.</xs:documentation>
+    			</xs:annotation>
+    		</xs:enumeration>
+			<xs:enumeration value="running">
+				<xs:annotation>
+					<xs:documentation>Indicates that the job is currently being processed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="completed">
+				<xs:annotation>
+					<xs:documentation>Indicates that the job has been completed (with or without errors).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="failed">
+				<xs:annotation>
+					<xs:documentation>Indicates that the job has failed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="cancelled">
+				<xs:annotation>
+					<xs:documentation>Indicates that the job has been cancelled by the user.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="deleted">
+				<xs:annotation>
+					<xs:documentation>Indicates that the job has been deleted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="AlternativeValueType">
+		<xs:annotation>
+			<xs:documentation>Generic container to keep textual values for any attribute in different languages and/or with different semantics and/or type.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Key" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Attribute/field name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Value" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Text value in selected language and with selected semantics and type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Type" type="NameTypeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Type of the alternative text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Semantics" type="TextSemanticsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Semantics of the alternative text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Language" type="LanguageCodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Language of the alternative text (RFC 5646 Lanuage Tag)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="LocalizedNameType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="Language" type="LanguageCodeType" use="optional">
+					<xs:annotation>
+						<xs:documentation>Language of the name (RFC 5646 Lanuage Tag)</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+                <xs:attribute name="Type" type="AddressNameType" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>TODO</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="Classification" type="AddressNameClassificationType" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>TODO</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="GeoAreaType" abstract="true"/>
+	<xs:complexType name="AddressType">
+		<xs:annotation>
+			<xs:documentation>Address record of a Location. Attributes are normalized to US feature names and can be mapped to the local feature levels (e.g. State matches "Bundesland" in Germany) using the NAVTEQ mapping tables for GDF.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Label" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Assembled address value for displaying purposes.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Country" type="CountryCodeType">
+				<xs:annotation>
+					<xs:documentation>ISO 3166-alpha-3 country code</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="State" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Includes the first subdivision level(s) below the country. The Nokia PNSS "region" is directly mapped to Address.state. For GDF, a country-wise mapping is required.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="County" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Includes the second subdivision level(s) below the country. Use of this field is optional if a second subdivision level is not available.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="City" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Refers to the locality of the address.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="District" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Includes the subdivision level below the city.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Subdistrict" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Includes the subdivision level below the district.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Street" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Street name in the requested primary language. For API implementations which do not support separate street and house number fields, this field may also contain the house number value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="HouseNumber" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>House number. Depending on regional characteristics, can also be house name. For API implementations which do not support separate street and house number fields, this field can be omitted.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PostalCode" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Postal code</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Floor" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Floor number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Suite" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Suite number or name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AlternativeAttributes" type="AlternativeValueType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Attributes in different languages and/or with different semantics. (see AlternativeValueType)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AdditionalData" type="KeyValuePairType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Generic key/value container to keep additional attributes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AddressLine" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Formatted address lines to be used e.g. for mailing purposes. The first line consists of street name (including pre-fix, directionals, street type) and house number. The second line consists of the city name and postal code plus in some countries the state name or abbreviation.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Building" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Building name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="DistanceMarker" type="DistanceMarkerType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>Distance marker reference for this location</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Unit" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>Unit name</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+    <xs:complexType name="DistanceMarkerType">
+        <xs:annotation>
+            <xs:documentation>Distance Markers are sequentially numbered markers placed along roads at regular intervals that serve as reference location signs.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Value" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Value representing the distance along the road.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Offset" type="xs:double" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>Distance to the previous marker. The value is given in the unit used by the distance marker.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Unit" type="DistanceUnitType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>Unit of measure mostly used in that country to describe road and traffic conditions. Value of offset of the distance marker are given in this unit.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="DirectionOnSign" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>Official directional identifiers assigned to the Distance Marker</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="TimeZoneType">
+    	<xs:annotation>
+    		<xs:documentation>A time zone represents a time zone offset and provides information about daylight savings for the regions represented by the time zone.</xs:documentation>
+    	</xs:annotation>
+    	<xs:sequence>
+    		<xs:element name="offset" type="xs:int">
+    			<xs:annotation>
+    				<xs:documentation>Actual offset in seconds from this time zone to UTC at the specified date. This information considers daylight savings.</xs:documentation>
+    			</xs:annotation>
+    		</xs:element>
+    		<xs:element name="rawOffset" type="xs:int">
+    			<xs:annotation>
+    				<xs:documentation>Actual offset in seconds from this time zone to UTC ignoring daylight savings.</xs:documentation>
+    			</xs:annotation>
+    		</xs:element>
+    		<xs:element name="nameShort" type="xs:string">
+    			<xs:annotation>
+    				<xs:documentation>Short name for the time zone, e.g. "CET"</xs:documentation>
+    			</xs:annotation>
+    		</xs:element>
+    		<xs:element name="nameLong" type="xs:string">
+    			<xs:annotation>
+    				<xs:documentation>Long name for the time zone, e.g. "Central European Time"</xs:documentation>
+    			</xs:annotation>
+    		</xs:element>
+    		<xs:element name="nameDstShort" type="xs:string">
+    			<xs:annotation>
+    				<xs:documentation>Daylight Saving Time name for the time zone (short name), e.g. "CEST"</xs:documentation>
+    			</xs:annotation>
+    		</xs:element>
+    		<xs:element name="nameDstLong" type="xs:string">
+    			<xs:annotation>
+    				<xs:documentation>Daylight Saving Time name for the time zone (long name), e.g. "Central European Summer Time"</xs:documentation>
+    			</xs:annotation>
+    		</xs:element>
+    		<xs:element name="inDaylightTime" type="xs:boolean">
+    			<xs:annotation>
+    				<xs:documentation>Returns true if the specified date is in Daylight Saving Time for the time zone.</xs:documentation>
+    			</xs:annotation>
+    		</xs:element>
+    		<xs:element name="dstSavings" type="xs:int">
+    			<xs:annotation>
+    				<xs:documentation>Number of seconds to be added to local standard time (outside of DST) to get local wall clock time during DST.</xs:documentation>
+    			</xs:annotation>
+    		</xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="id" type="xs:string">
+    		<xs:annotation>
+    			<xs:documentation>Identifier for the time zone, e.g. "Europe/Berlin"</xs:documentation>
+    		</xs:annotation>
+    	</xs:attribute>
+    </xs:complexType>
+
+
+    <xs:simpleType name="SpeedLimitSourceType">
+        <xs:annotation>
+            <xs:documentation>Speed Limit Source is a generalized identification of the source for a Speed Limit information.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="posted">
+                <xs:annotation>
+                    <xs:documentation>Speed limit is specified through posted signs (including speed limit values painted on the actual road)</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="derived">
+                <xs:annotation>
+                    <xs:documentation>Speed limit is derived (e.g. based on administrative defaults)</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="SpeedLimitType">
+        <xs:annotation>
+            <xs:documentation>Speed limits indicate the legal speed for a vehicle.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Value" type="xs:int">
+                <xs:annotation><xs:documentation>Value of the speed limit. The unit for the limit (mph or kph) is defined in the unit element.</xs:documentation></xs:annotation>
+            </xs:element>
+            <xs:element name="Unit" type="SpeedUnitType">
+                <xs:annotation><xs:documentation>Unit for the speed limit (mph or kph).</xs:documentation></xs:annotation>
+            </xs:element>
+            <xs:element name="Source" type="SpeedLimitSourceType">
+                <xs:annotation><xs:documentation>Generalized information about the source of the speed limit (posted or derived).</xs:documentation></xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="UTCTimeOffsetType">
+        <xs:annotation>
+            <xs:documentation>UTC time offset showing the difference in hours and minutes from Coordinated Universal Time (UTC), from the westernmost (−12:00) to the easternmost (+14:00). UTC itself is represented with a time offset "UTC&#x00B1;00:00"</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="UTC[&#x00B1;|+-][0-9]{2}:[0-5][0-9]"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CurrencyType">
+        <xs:annotation>
+            <xs:documentation>3-letter code abbreviation for a currency according to ISO 4217</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:length value="3"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DrivingSideType">
+        <xs:annotation>
+            <xs:documentation>Driving side for road traffic</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="left">
+                <xs:annotation><xs:documentation>left-hand traffic</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="right">
+                <xs:annotation><xs:documentation>right-hand traffic</xs:documentation></xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="SystemOfMeasurementType">
+        <xs:annotation>
+            <xs:documentation>System of measurement</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="imperial">
+                <xs:annotation><xs:documentation>System using imperial units like miles, gallons, etc.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="metric">
+                <xs:annotation><xs:documentation>System using metric units like meters, liters, etc.</xs:documentation></xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="RecurringTimeIntervalsCombinationType">
+        <xs:annotation>
+            <xs:documentation>
+                ISO 8601 recurring time interval or intersection(*), sum(+) or substraction(-) of its combinations. Prefix notation is used for operations.
+                Example interval occuring yearly on 01 and 03 January, 6:00 - 7:00 AM:"*+(R/P1D/FREQ=YR;BYMO=1;BYMD=1)(R/P1D/FREQ=YR;BYMO=1;BYMD=3)(R/PT1H/FREQ=DY;BYHR=6)"
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

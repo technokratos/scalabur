@@ -2,44 +2,66 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>repocrud</artifactId>
-        <groupId>org.repocrud</groupId>
-        <version>1.00-SNAPSHOT</version>
-    </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.scalobur</groupId>
     <artifactId>restclient</artifactId>
     <version>1.00-SNAPSHOT</version>
 
+
+    <properties>
+        <DestinationDir>../../target</DestinationDir>
+        <DependencyDestinationDir>../../target/plugins/lib</DependencyDestinationDir>
+        <xsdDirectory>src/main/resources/</xsdDirectory>
+        <xsdBindings>bindings.xjb</xsdBindings>
+        <compileXSDPhase>none</compileXSDPhase>
+        <xsdPackage></xsdPackage>
+        <xsdFile></xsdFile>
+        <bindingsFile></bindingsFile>
+        <spring-boot.version>2.1.3.RELEASE</spring-boot.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-rest</artifactId>
+            <version>${spring-boot.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
+            <version>2.9.9</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.9</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
+            <version>1.11</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <version>${spring-boot.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -47,8 +69,84 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.14.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.sabomichal</groupId>
+                        <artifactId>immutable-xjc-plugin</artifactId>
+                        <version>1.4</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.fasterxml.jackson.module</groupId>
+                        <artifactId>jackson-module-jaxb-annotations</artifactId>
+                        <version>LATEST</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>xsdgen-JAXB-MODULECONFIG</id>
+                        <phase>${compileXSDPhase}</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaDirectory>${xsdDirectory}</schemaDirectory>
+                            <generateDirectory>src/main/java/</generateDirectory>
+                            <generatePackage>${xsdPackage}</generatePackage>
+                            <schemaIncludes>
+                                <include>${xsdFile}</include>
+                            </schemaIncludes>
+                            <bindingIncludes>
+                                <include>${xsdBindings}</include>
+                            </bindingIncludes>
+                            <args>
+                                <!--<arg>-Xcopyable</arg>-->
+                                <arg>-Xannotate</arg>
+                                <arg>-Xinject-code</arg>
+                                <arg>-Xsimplify</arg>
+                                <arg>-Xinheritance</arg>
+                                <arg>-immutable</arg>
+                                <arg>-imm-builder</arg><!--реализация билдера-->
+                                <arg>-imm-cc</arg> <!--копи-кунструктор-->
+<!--                                <arg>-imm-constructordefaults</arg>-->
+                                <arg>-Xwildcard</arg>
+<!--                                <arg>-contentForWildcard</arg>-->
+                            </args>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <useDependenciesAsEpisodes>false</useDependenciesAsEpisodes>
+                    <extension>true</extension>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.jvnet.jaxb2_commons</groupId>
+                            <artifactId>jaxb2-basics</artifactId>
+                            <version>1.11.1</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.jvnet.jaxb2_commons</groupId>
+                            <artifactId>jaxb2-basics-annotate</artifactId>
+                            <version>1.0.2</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.jvnet.jaxb2_commons</groupId>
+                            <artifactId>jaxb2-annotate-plugin-test-annox-annotations</artifactId>
+                            <version>1.0.0</version>
+                        </plugin>
+                    </plugins>
+
+                </configuration>
             </plugin>
         </plugins>
     </build>
+
+
+
 
 </project>
