@@ -35,7 +35,7 @@ import java.util.Arrays;
 public class DemoApplication implements ApplicationRunner {
 
     public static void main(String[] args) {
-       // server();
+        server();
         SpringApplication.run(DemoApplication.class, args);
 
     }

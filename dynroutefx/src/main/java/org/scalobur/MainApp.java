@@ -8,14 +8,17 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.stage.Stage;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -80,6 +83,7 @@ public class MainApp  extends Application {
         List<Node> routes = new ArrayList<>();
         RouteOptimizator routeOptimizator = new RouteOptimizator();
         NodeFactory nodeFactory = new NodeFactory(group.getChildren(), routeOptimizator);
+        AtomicReference<Node> prevNode = new AtomicReference<>(null);
         root.setOnMouseClicked(e-> {
 
             double x = e.getX();
@@ -87,16 +91,42 @@ public class MainApp  extends Application {
             Circle circle = new Circle(x, y, SIZE/DISCRET);
 
             group.getChildren().add(circle);
+
+
+            Node node;
             if (e.isControlDown()) {
 
-                nodeFactory.addRoute(circle);
+                node = nodeFactory.addRoute(circle);
             } else {
 
-                nodeFactory.addNode(circle);
+
+                if (!e.isShiftDown()) {//add route
+
+                    if (prevNode.get() == null) {
+                        node = nodeFactory.addNode(circle);
+                    }
+                    else {
+                        node = nodeFactory.initOnlyNode(circle);
+                        prevNode.get().originalNext = node;
+                        nodeFactory.process(prevNode.get());
+                        prevNode.set(null);
+                    }
+
+                } else {//if pressed make original
+                    node = nodeFactory.initOnlyNode(circle);
+                    if (prevNode.get() == null) {
+                        circle.setFill(nodeFactory.getRandomColor());
+                        prevNode.set(node);
+                    } else {
+                        prevNode.get().originalNext = node;
+                        node.circle.setFill(prevNode.get().circle.getFill());
+                    }
+                }
             }
 
 
         });
+
     }
 
     // заказ начальный конечный адрес
@@ -171,6 +201,14 @@ public class MainApp  extends Application {
         }
     }
 
+    @Data
+    @AllArgsConstructor
+    private static class InsertInfo {
+        List<Pair<Node, Node>> challengersWithPrevNode = new ArrayList<>();
+        @Setter
+        double newLength;
+    }
+
     private class RouteOptimizator {
 
     }
@@ -199,10 +237,48 @@ public class MainApp  extends Application {
 
         }
 
-        void addNode(Circle circle) {
+        Node addNode(Circle circle) {
             Node node = Node.of(circle);
             updateWeights(node);
             process(node);
+            return node;
+        }
+
+        public Node addRoute(Circle circle) {
+            circle.setFill(getRandomColor());
+            Node node = Node.of(circle);
+            updateWeights(node);
+            routes.add(node);
+            return node;
+        }
+
+        public Node initOnlyNode(Circle circle) {
+            Node node = Node.of(circle);
+            updateWeights(node);
+            return node;
+        }
+
+        private void addToRoute(Node selectedRoute, Node node) {
+
+            Node oldNext = selectedRoute.next;
+
+            node.circle.setFill(selectedRoute.circle.getFill());
+            selectedRoute.next = node;
+            node.next = oldNext;
+            Line line = getLine(selectedRoute, node);
+
+            if (oldNext != null) {
+                Line nextLine = getLine(node, oldNext);
+
+                shapes.remove(selectedRoute.nextLine);
+                node.setNextLine(nextLine);
+                shapes.add(nextLine);
+            }
+
+            selectedRoute.setNextLine(line);
+            shapes.add(line);
+
+
         }
 
         private void updateWeights(Node node) {
@@ -230,6 +306,8 @@ public class MainApp  extends Application {
             } else {
                 List<Pair<Node, Double>> selectedNode = routes.stream().map(route -> getMinimumLengthModification(route, node)).collect(Collectors.toList());
 
+                List<InsertInfo>
+
                 Optional<Pair<Node, Double>> near = selectedNode.stream().min((o1, o2) -> (int) (o1.getRight() - o2.getRight()));
                 near.ifPresent(p-> addToRoute(p.getLeft(), node));
 
@@ -237,28 +315,7 @@ public class MainApp  extends Application {
             }
         }
 
-        private void addToRoute(Node selectedRoute, Node node) {
 
-            Node oldNext = selectedRoute.next;
-
-            node.circle.setFill(selectedRoute.circle.getFill());
-            selectedRoute.next = node;
-            node.next = oldNext;
-            Line line = getLine(selectedRoute, node);
-
-            if (oldNext != null) {
-                Line nextLine = getLine(node, oldNext);
-
-                shapes.remove(selectedRoute.nextLine);
-                node.setNextLine(nextLine);
-                shapes.add(nextLine);
-            }
-
-            selectedRoute.setNextLine(line);
-            shapes.add(line);
-
-
-        }
 
         private Line getLine(Node selectedRoute, Node node) {
             return new Line(selectedRoute.circle.getCenterX(), selectedRoute.circle.getCenterY(), node.circle.getCenterX(), node.circle.getCenterY());
@@ -276,6 +333,8 @@ public class MainApp  extends Application {
             return maxIndex;
         }
 
+
+
         private Pair<Node, Double> getMinimumLengthModification(Node route, Node challenger) {
             Node next =  route;
             Node selectedNode = route;
@@ -286,6 +345,7 @@ public class MainApp  extends Application {
                 double nextWeight = (next.next != null) ? weights[next.index][next.next.index]:0;
                 double challengerWeight = weights[next.index][challenger.index];
                 double challengeNextWeight = (next.next!=null)? weights[challenger.index][next.next.index]:0;
+
 
 
                 double length = commonLength - nextWeight + challengerWeight + challengeNextWeight;
@@ -301,6 +361,8 @@ public class MainApp  extends Application {
             //todo return MergeNode
             return Pair.of(selectedNode, minLength);
         }
+
+
 
         static class MergeNode{
             /*
@@ -320,12 +382,7 @@ public class MainApp  extends Application {
         }
 
 
-        public void addRoute(Circle circle) {
-            circle.setFill(getRandomColor());
-            Node node = Node.of(circle);
-            updateWeights(node);
-            routes.add(node);
-        }
+
 
         private Color getRandomColor() {
             return Color.rgb(r.nextInt(255),r.nextInt(255),r.nextInt(255));
