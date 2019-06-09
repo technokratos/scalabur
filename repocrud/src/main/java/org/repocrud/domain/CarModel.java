@@ -37,10 +37,13 @@ public class CarModel extends Auditable {
     private Integer trailer;
 
     @NotNull
-    private Double weight;
+    private Double maxWeight;
 
     @NotNull
-    private Double maxLoadWeight;
+    private Double loadWeight;
+
+    @NotNull
+    private Double volume;
 
     @NonNull
     private Integer axis = 3;
@@ -50,6 +53,10 @@ public class CarModel extends Auditable {
 
     @NotNull
     private Double fullConsumption;
+
+    public String toString() {
+        return title + " " + type;
+    }
 
 
 

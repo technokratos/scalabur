@@ -123,11 +123,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // Restrict access to our application.
                 .and()
                 .authorizeRequests()
+                .antMatchers("/order/").permitAll()
 
                 // Allow all flow internal requests.
                 .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
                 .antMatchers("/report").permitAll() //page report works, but isn't accessed by direct link
                 .antMatchers("/export").permitAll()
+                .antMatchers("/status/*").permitAll()
+
+
+                .antMatchers("/request/*/*/*/*/*").permitAll()
+                .antMatchers("/updateposition/*/*/*").permitAll()
+                .antMatchers("/route/*").permitAll()
+                .antMatchers("/courierAuth/*").permitAll()
+                .antMatchers("/updateposition/*/*/*").permitAll()
 
                 // Allow all requests by logged in users.
                 .anyRequest().hasAnyAuthority("admin")

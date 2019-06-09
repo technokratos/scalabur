@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import org.repocrud.history.Auditable;
+import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -23,23 +24,25 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldNameConstants
-public class Car extends Auditable {
+public class Courier extends Auditable {
     @NotNull
     private String title;
 
-
+    @NotNull
+    private String phoneId;
 
     @ManyToOne
-    private CarModel carModel;
+    private Car car;
 
-    private String carId;
+    private String systemApiId;
 
-    @Embedded
-    private GeoPosition position;
+    private Double latitude;
+    private Double longitude;
 
-
+    @Override
     public String toString() {
-        return title + " " + carModel;
+        return title + ((car!= null)? " " + car : "");
     }
+
 
 }

@@ -65,7 +65,7 @@ public class SettingsCrudContainer extends AbstractCrudContainer<SmtpSettings, L
         Button button = new Button(text("check"));
         button.addClickListener(event -> {
 
-            boolean test = smtpFactoryService.sendWarning("test", smtpSettings);
+            boolean test = smtpFactoryService.sendAuthMail("test", smtpSettings, "+79643983672");
             if (test) {
                 Notification.show(text(SettingsCrudContainer.class, "sentTestMessage"));
             } else {

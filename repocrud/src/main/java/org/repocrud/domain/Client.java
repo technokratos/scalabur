@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
+import org.repocrud.annotations.NestedEntity;
 import org.repocrud.history.Auditable;
-import org.springframework.lang.NonNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * оптимизацией затрат на топливо
@@ -26,14 +27,20 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldNameConstants
-public class Driver extends Auditable {
+public class Client extends Auditable {
     @NotNull
     private String title;
 
-    private String systemApiId;
 
+    @Column(unique=true)
+    private String clientId;
 
+    @OneToMany
+    @NestedEntity
+    private List<RequestRoute> requestList;
 
-
-
+    @Override
+    public String toString() {
+        return title + " " + clientId;
+    }
 }

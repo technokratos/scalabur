@@ -104,9 +104,22 @@ public class SmtpFactoryService {
 
             JavaMailSender sender = getJavaMailSender(smtpSettings);
             @NotNull String warningMail = smtpSettings.getWarningMail();
-            return Stream.of(warningMail.split(";")).allMatch(mail -> sendSingleWarning(warningMessage, smtpSettings, sender, mail));
+            return Stream.of(warningMail.split(";")).allMatch(mail -> sendSingleWarning(warningMessage, smtpSettings, sender, mail, "warningEmail"));
         } catch (Exception e) {
             log.error("Error sent warning message " + warningMessage, e);
+            return false;
+        }
+
+    }
+
+    public boolean sendAuthMail(String text, SmtpSettings smtpSettings, String subject) {
+        try {
+
+            JavaMailSender sender = getJavaMailSender(smtpSettings);
+            @NotNull String warningMail = smtpSettings.getWarningMail();
+            return Stream.of(warningMail.split(";")).allMatch(mail -> sendSingleWarning(text, smtpSettings, sender, mail, subject));
+        } catch (Exception e) {
+            log.error("Error sent warning message " + text, e);
             return false;
         }
 
@@ -120,7 +133,7 @@ public class SmtpFactoryService {
                 return false;
             }
             JavaMailSender sender = getJavaMailSender(smtpSettings);
-            return Stream.of(warningMail.split(";")).allMatch(mail -> sendSingleWarning(warningMessage, smtpSettings, sender, mail));
+            return Stream.of(warningMail.split(";")).allMatch(mail -> sendSingleWarning(warningMessage, smtpSettings, sender, mail, "warningEmail"));
         } catch (Exception e) {
             log.error("Error sent warning message " + warningMessage, e);
             return false;
@@ -128,23 +141,23 @@ public class SmtpFactoryService {
 
     }
 
-    private boolean sendSingleWarning(String warningMessage, SmtpSettings smtpSettings, JavaMailSender sender, @NotNull String warningMail) {
+    private boolean sendSingleWarning(String warningMessage, SmtpSettings smtpSettings, JavaMailSender sender, @NotNull String warningMail, String subject) {
         @NotNull String smptUser = smtpSettings.getSmptUser();
-        return sendSingleWarning(warningMessage, sender, warningMail, smptUser);
+        return sendSingleWarning(warningMessage, sender, warningMail, smptUser, subject);
     }
 
-    private boolean sendSingleWarning(String warningMessage, JavaMailSender sender, @NotNull String warningMail, @NotNull String smptUser) {
+    private boolean sendSingleWarning(String text, JavaMailSender sender, @NotNull String warningMail, @NotNull String smptUser, String subject) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setSubject("warningEmail");
-            message.setText(warningMessage);
+            message.setSubject(subject);
+            message.setText(text);
             message.setTo(warningMail);
             message.setFrom(smptUser);
             sender.send(message);
             log.info("Sent mail {}, {}", smptUser, warningMail);
             return true;
         } catch (Exception e) {
-            log.error("Error sent warning message " + warningMessage, e);
+            log.error("Error sent warning message " + text, e);
             return false;
         }
     }
