@@ -1,136 +1,16 @@
-package org.scalobur;
+package org.repocrud.service.route;
 
-import javafx.application.Application;
-import javafx.collections.ObservableList;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
-import javafx.stage.Stage;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
-import static java.lang.String.format;
-
-/**
- * @author Denis B. Kulikov<br/>
- * date: 04.06.2019:6:03<br/>
- */
-public class MainApp extends Application {
-
-    public static final int SIZE = 800;
-    private static final int DISCRET = 100;
-
-    public static void main(String[] args) throws Exception {
-        launch(args);
-    }
-
-    @Override
-    public void start(Stage stage) throws Exception {
-        Rectangle rectangle1 = new Rectangle(10, 10, 20, 20);
-        rectangle1.setFill(Color.BLUE);
-
-        // Createing a green Rectangle by usage of a RectangleBuilder
-        Rectangle rectangle2 = new Rectangle(100, 10, 20, 20);
-
-
-        // Create the VBox by usage of a VBoxBuilder
-        Group group = new Group();
-        VBox root = new VBox(group);
-
-        Polygon polygon = new Polygon();
-        Double[] rect = {
-                0.0, 0.0,
-                Double.valueOf(SIZE), 0.0,
-                Double.valueOf(SIZE), Double.valueOf(SIZE),
-                0.0, Double.valueOf(SIZE),
-        };
-        //polygon.getPoints().addAll(rect);
-
-        Polyline polyline = new Polyline();
-        polyline.getPoints().addAll(rect);
-        group.getChildren().add(polyline);
-
-
-        // Set the vertical spacing between children to 10px
-
-        // Create the Scene by usage of a SceneBuilder
-        Scene scene = new Scene(root);
-
-        root.setPrefSize(SIZE, SIZE);
-
-        // Add the scene to the Stage
-        stage.setScene(scene);
-        // Set the title of the Stage
-        stage.setTitle("A Scene Builder Example");
-        // Display the Stage
-        stage.show();
-
-
-        List<Node> nodes = new ArrayList<>();
-        List<Node> routes = new ArrayList<>();
-        NodeFactory nodeFactory = new NodeFactory(group.getChildren());
-        AtomicReference<Node> prevNode = new AtomicReference<>(null);
-        root.setOnMouseClicked(e -> {
-
-            double x = e.getX();
-            double y = e.getY();
-            Circle circle = new Circle(x, y, SIZE / DISCRET);
-
-            group.getChildren().add(circle);
-
-
-            Node node;
-            if (e.isControlDown()) {
-
-                node = nodeFactory.addRoute(new Position(circle));
-            } else {
-
-
-                if (prevNode.get() != null) {
-                    node = nodeFactory.initOnlyNode(new Position(circle));
-                    prevNode.get().originalNext = node;
-                    nodeFactory.process(prevNode.get());
-                    prevNode.set(null);
-                } else {
-
-                    if (!e.isShiftDown()) {//add route
-
-                        if (prevNode.get() == null) {
-                            node = nodeFactory.addNode(new Position(circle));
-                        } else {
-                            node = nodeFactory.initOnlyNode(new Position(circle));
-                            prevNode.get().originalNext = node;
-                            nodeFactory.process(prevNode.get());
-                            prevNode.set(null);
-                        }
-
-                    } else {//if pressed make original
-                        node = nodeFactory.initOnlyNode(new Position(circle));
-                        if (prevNode.get() == null) {
-                            circle.setFill(nodeFactory.getRandomColor());
-                            prevNode.set(node);
-                        } else {
-                            prevNode.get().originalNext = node;
-                            node.markAs(prevNode.get());;
-                        }
-                    }
-                }
-            }
-
-
-        });
-
-    }
-
+public class RoutesUtils {
     @AllArgsConstructor
     static class SingleInsertInfo {
         Node route;
@@ -142,12 +22,10 @@ public class MainApp extends Application {
     }
 
 
-
     @RequiredArgsConstructor
     static class Node {
         static int indexCounter = 0;
-        final Position circle;
-
+        final Circle circle;
         final int index;
 
         Node next;
@@ -157,7 +35,7 @@ public class MainApp extends Application {
         Node originalPrev;
         private Line nextLine;
 
-        public Node(Position circle) {
+        public Node(Circle circle) {
             this.circle = circle;
             this.index = indexCounter++;
             originalNext = null;
@@ -183,30 +61,16 @@ public class MainApp extends Application {
             this.originalPrev = originalPrev;
         }
 
-        static Node of(Position circle) {
+        static Node of(Circle circle) {
             return new Node(circle);
         }
-
 
         public void setNextLine(Line nextLine) {
             this.nextLine = nextLine;
         }
 
         public String toString() {
-            return format("%d [%.0f;%.0f]", index, circle.getLatitude(), circle.getLatitude());
-        }
-
-
-        public void markAs(Node selectedRoute) {
-            this.circle.circle.setFill(selectedRoute.circle.circle.getFill());
-        }
-
-        public void mark() {
-            this.circle.circle.setFill(getRandomColor());
-        }
-        private Color getRandomColor() {
-            Random r = new Random();
-            return Color.rgb(r.nextInt(255),r.nextInt(255),r.nextInt(255));
+            return format("%d [%.0f;%.0f]", index, circle.getCenterX(), circle.getCenterY());
         }
     }
 
@@ -238,28 +102,28 @@ public class MainApp extends Application {
 
         private final Random r = new Random();
 
-        public NodeFactory(ObservableList<javafx.scene.Node> shapes) {
+        public NodeFactory(ObservableList<javafx.scene.Node> shapes, RouteOptimizator routeOptimizator) {
             this.shapes = shapes;
+            this.routeOptimizator = routeOptimizator;
 
         }
 
-        Node addNode(Position circle) {
+        Node addNode(Circle circle) {
             Node node = Node.of(circle);
             updateWeights(node);
             process(node);
             return node;
         }
 
-        public Node addRoute(Position circle) {
-
+        public Node addRoute(Circle circle) {
+            circle.setFill(getRandomColor());
             Node node = Node.of(circle);
-            node.mark();
             updateWeights(node);
             routes.add(node);
             return node;
         }
 
-        public Node initOnlyNode(Position circle) {
+        public Node initOnlyNode(Circle circle) {
             Node node = Node.of(circle);
             updateWeights(node);
             return node;
@@ -269,8 +133,7 @@ public class MainApp extends Application {
 
             Node oldNext = selectedRoute.next;
 
-
-            node.markAs(selectedRoute);
+            node.circle.setFill(selectedRoute.circle.getFill());
             selectedRoute.next = node;
             node.next = oldNext;
             Line line = getLine(selectedRoute, node);
@@ -300,17 +163,17 @@ public class MainApp extends Application {
         }
 
         private double getWeight(Node node, Node old) {
-            double x = old.circle.getLatitude();
-            double y = old.circle.getLongitude();
-            double nx = node.circle.getLatitude();
-            double ny = node.circle.getLongitude();
+            double x = old.circle.getCenterX();
+            double y = old.circle.getCenterY();
+            double nx = node.circle.getCenterX();
+            double ny = node.circle.getCenterY();
             return Math.sqrt((x - nx) * (x - nx) + (y - ny) * (y - ny));
         }
 
         public void process(Node node) {
             if (routes.isEmpty()) {
                 routes.add(node);
-                node.mark();
+                node.circle.setFill(getRandomColor());
             } else {
 
                 Map<Node, Double> routeToLenMap = routes.stream().collect(Collectors.toMap(t -> t, t -> calcOnRoute(t, (lenNode, prevValue) -> (lenNode.next != null) ? weights[lenNode.index][lenNode.next.index] + prevValue : prevValue)));
@@ -346,7 +209,7 @@ public class MainApp extends Application {
 
 
         private Line getLine(Node selectedRoute, Node node) {
-            return new Line(selectedRoute.circle.getLatitude(), selectedRoute.circle.getLongitude(), node.circle.getLatitude(), node.circle.getLongitude());
+            return new Line(selectedRoute.circle.getCenterX(), selectedRoute.circle.getCenterY(), node.circle.getCenterX(), node.circle.getCenterY());
         }
 
         private int findMaxIndex(double[] doubles) {
@@ -388,6 +251,13 @@ public class MainApp extends Application {
         }
 
 
+        static class MergeNode {
+            /*
+            Pairs of challenge node and node of main route
+             */
+            List<Pair<Node, Node>> insertAfter = new ArrayList<>();
+            double length;
+        }
 
         private Double calcOnRoute(Node route, BiFunction<Node, Double, Double> function) {
             Node next = route;
@@ -400,9 +270,7 @@ public class MainApp extends Application {
         }
 
 
-        private Color getRandomColor() {
-            return Color.rgb(r.nextInt(255), r.nextInt(255), r.nextInt(255));
-        }
+
     }
 
 
@@ -417,18 +285,5 @@ public class MainApp extends Application {
         double length() {
             return Math.sqrt(x * x + y * y);
         }
-    }
-
-    @AllArgsConstructor
-    private static class Position {
-        final Circle circle;
-        public double getLatitude() {
-            return circle.getCenterX();
-        }
-        public double getLongitude() {
-            return circle.getCenterY();
-        }
-
-
     }
 }

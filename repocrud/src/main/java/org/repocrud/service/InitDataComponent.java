@@ -43,14 +43,18 @@ public class InitDataComponent {
     }
 
     private void addCourier() {
-        CarModel carModel= new CarModel("MAZ", TransportType.Truck, 1, 20000d, 12000d, 40d, 5, 20d, 40d);
+        CarModel carModel = new CarModel("MAZ", TransportType.Truck, 1, 20000d, 12000d, 40d, 5, 20d, 40d);
         carModelRepository.saveAndFlush(carModel);
-        Car car = new Car("textCar",carModel, null, new GeoPosition(37.99, 140.9, 0d));
+        Car car = new Car("textCar", carModel, null, new GeoPosition(37.99, 140.9, 0d));
         carRepository.saveAndFlush(car);
-        Courier courier = new Courier("testCourier", "796439833672", car, null, 37.99, 140.9);
-        courierRepository.saveAndFlush(courier);
 
-        carRepository.saveAndFlush(car);
+        Courier courier = new Courier("Denis", "796439833672", car, null, 37.99, 140.9);
+        courierRepository.saveAndFlush(courier);
+        Car secondCar = new Car("second", carModel, null, new GeoPosition(37.99, 140.9, 0d));
+        carRepository.saveAndFlush(secondCar);
+        Courier seconCouirier = new Courier("Mihail", "79992007915", secondCar, null, 37.99, 140.9);
+        courierRepository.saveAndFlush(seconCouirier);
+
     }
 
     private void addSmpt() {
