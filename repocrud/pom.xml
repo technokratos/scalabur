@@ -23,7 +23,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Dependencies -->
-        <vaadin.version>13.0.1</vaadin.version>
+        <vaadin.version>19.0.5</vaadin.version>
 
         <!-- LOG level -->
         <logger.root.level>DEBUG</logger.root.level>
